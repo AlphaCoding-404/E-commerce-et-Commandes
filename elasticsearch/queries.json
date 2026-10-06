@@ -1,0 +1,277 @@
+{
+  "queries": [
+    {
+      "name": "global_kpis",
+      "question": "Quels sont les indicateurs globaux (CA, panier moyen, clients actifs, commandes) hors commandes annulées ?",
+      "body": {
+        "size": 0,
+        "query": {
+          "bool": {
+            "must_not": [
+              {
+                "term": {
+                  "status": "cancelled"
+                }
+              }
+            ]
+          }
+        },
+        "aggs": {
+          "total_revenue": {
+            "sum": {
+              "field": "total_amount"
+            }
+          },
+          "avg_basket": {
+            "avg": {
+              "field": "total_amount"
+            }
+          },
+          "unique_customers": {
+            "cardinality": {
+              "field": "customer_id"
+            }
+          },
+          "total_orders": {
+            "value_count": {
+              "field": "order_id"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "revenue_per_month",
+      "question": "Comment le chiffre d'affaires évolue-t-il mois par mois ?",
+      "body": {
+        "size": 0,
+        "query": {
+          "bool": {
+            "must_not": [
+              {
+                "term": {
+                  "status": "cancelled"
+                }
+              }
+            ]
+          }
+        },
+        "aggs": {
+          "monthly": {
+            "date_histogram": {
+              "field": "order_date",
+              "calendar_interval": "month",
+              "format": "yyyy-MM"
+            },
+            "aggs": {
+              "revenue": {
+                "sum": {
+                  "field": "total_amount"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "revenue_by_category",
+      "question": "Quelles catégories de produits génèrent le plus de chiffre d'affaires ?",
+      "body": {
+        "size": 0,
+        "query": {
+          "bool": {
+            "must_not": [
+              {
+                "term": {
+                  "status": "cancelled"
+                }
+              }
+            ]
+          }
+        },
+        "aggs": {
+          "by_category": {
+            "terms": {
+              "field": "category",
+              "size": 10,
+              "order": {
+                "revenue": "desc"
+              }
+            },
+            "aggs": {
+              "revenue": {
+                "sum": {
+                  "field": "total_amount"
+                }
+              },
+              "units_sold": {
+                "sum": {
+                  "field": "quantity"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "top_10_products",
+      "question": "Quels sont les 10 produits les plus rentables ?",
+      "body": {
+        "size": 0,
+        "query": {
+          "bool": {
+            "must_not": [
+              {
+                "term": {
+                  "status": "cancelled"
+                }
+              }
+            ]
+          }
+        },
+        "aggs": {
+          "top_products": {
+            "terms": {
+              "field": "product_name.keyword",
+              "size": 10,
+              "order": {
+                "revenue": "desc"
+              }
+            },
+            "aggs": {
+              "revenue": {
+                "sum": {
+                  "field": "total_amount"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "payment_methods",
+      "question": "Quels moyens de paiement sont les plus utilisés ?",
+      "body": {
+        "size": 0,
+        "aggs": {
+          "by_payment": {
+            "terms": {
+              "field": "payment_method",
+              "size": 10
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "cancellation_rate_by_state",
+      "question": "Quel est le taux d'annulation par État (10 États les plus actifs) ?",
+      "body": {
+        "size": 0,
+        "aggs": {
+          "by_state": {
+            "terms": {
+              "field": "state",
+              "size": 10
+            },
+            "aggs": {
+              "cancellation_rate": {
+                "avg": {
+                  "field": "is_cancelled"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "avg_basket_by_state",
+      "question": "Dans quels États le panier moyen est-il le plus élevé (États d'au moins 50 commandes) ?",
+      "body": {
+        "size": 0,
+        "query": {
+          "bool": {
+            "must_not": [
+              {
+                "term": {
+                  "status": "cancelled"
+                }
+              }
+            ]
+          }
+        },
+        "aggs": {
+          "by_state": {
+            "terms": {
+              "field": "state",
+              "size": 10,
+              "min_doc_count": 50,
+              "order": {
+                "avg_basket": "desc"
+              }
+            },
+            "aggs": {
+              "avg_basket": {
+                "avg": {
+                  "field": "total_amount"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "orders_by_weekday",
+      "question": "Quels jours de la semaine concentrent le plus de commandes ?",
+      "body": {
+        "size": 0,
+        "aggs": {
+          "by_weekday": {
+            "terms": {
+              "field": "order_weekday",
+              "size": 7
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "high_value_orders_by_category",
+      "question": "Dans quelles catégories trouve-t-on le plus de commandes à forte valeur (>= 500) ?",
+      "body": {
+        "size": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "is_high_value": true
+                }
+              }
+            ],
+            "must_not": [
+              {
+                "term": {
+                  "status": "cancelled"
+                }
+              }
+            ]
+          }
+        },
+        "aggs": {
+          "by_category": {
+            "terms": {
+              "field": "category",
+              "size": 10
+            }
+          }
+        }
+      }
+    }
+  ]
+}

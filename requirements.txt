@@ -1,0 +1,5 @@
+# Dépendances installées dans l'image Airflow (voir Dockerfile).
+# Airflow lui-même est fourni par l'image officielle apache/airflow.
+pandas>=2.1,<2.3
+elasticsearch>=8.10,<9
+requests>=2.31

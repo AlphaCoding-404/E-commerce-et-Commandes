@@ -1,0 +1,33 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "dynamic": "strict",
+    "properties": {
+      "order_id":       { "type": "keyword" },
+      "customer_id":    { "type": "keyword" },
+      "customer_name":  { "type": "text", "fields": { "keyword": { "type": "keyword" } } },
+      "email":          { "type": "keyword" },
+      "country":        { "type": "keyword" },
+      "state":          { "type": "keyword" },
+      "city":           { "type": "keyword" },
+      "product_id":     { "type": "keyword" },
+      "product_name":   { "type": "text", "fields": { "keyword": { "type": "keyword" } } },
+      "category":       { "type": "keyword" },
+      "quantity":       { "type": "integer" },
+      "unit_price":     { "type": "float" },
+      "discount":       { "type": "float" },
+      "total_amount":   { "type": "float" },
+      "order_date":     { "type": "date", "format": "strict_date_optional_time" },
+      "order_month":    { "type": "keyword" },
+      "order_weekday":  { "type": "keyword" },
+      "status":         { "type": "keyword" },
+      "payment_method": { "type": "keyword" },
+      "is_high_value":  { "type": "boolean" },
+      "is_cancelled":   { "type": "integer" },
+      "etl_run_date":   { "type": "date", "format": "yyyy-MM-dd" }
+    }
+  }
+}

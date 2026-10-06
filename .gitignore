@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+logs/*
+!logs/.gitkeep
+# données générées pendant l'exécution (data/raw/orders.csv, lui, est versionné)
+data/raw/api_*.json
+data/staging/*
+data/analysis_results.json
